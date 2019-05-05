@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MD5 Tool", "MD5 Tool\MD5 Tool.csproj", "{E844BAF9-FE20-45BC-B471-3B3D9E57FD46}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GreyHackDEC", "GreyHackDEC\GreyHackDEC.csproj", "{7D76B85E-F73A-4B92-BC0D-9E1EE769CEE7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{E844BAF9-FE20-45BC-B471-3B3D9E57FD46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E844BAF9-FE20-45BC-B471-3B3D9E57FD46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E844BAF9-FE20-45BC-B471-3B3D9E57FD46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D76B85E-F73A-4B92-BC0D-9E1EE769CEE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D76B85E-F73A-4B92-BC0D-9E1EE769CEE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D76B85E-F73A-4B92-BC0D-9E1EE769CEE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D76B85E-F73A-4B92-BC0D-9E1EE769CEE7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

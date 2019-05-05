@@ -11,7 +11,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-namespace MD5_Tool
+namespace GreyHackDEC
 {
     public partial class Main : Form
     {
@@ -24,103 +24,26 @@ namespace MD5_Tool
         public string proxy2 = "http://134.209.21.48:3128";
         public string proxy3 = "http://188.166.145.121:3128";
 
-        public async Task StringToMD5()
-        {
-            startButton.Enabled = false;
-            md5Box.ReadOnly = true;
-            stringBox.ReadOnly = true;
-            md5Box.Text = "";
-            string[] newArray = stringBox.Text.Split(new string[] { System.Environment.NewLine }, StringSplitOptions.None);
-            int i = 0;
-            int j = 0;
-            foreach (var str in newArray)
-            {
-                string url = baseaddress + stringquery + newArray[i];
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                request.UserAgent = @"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.4) Gecko/20060508 Firefox/1.5.0.4";
-                if (j >= 9)
-                {
-                    WebProxy newProxy = new WebProxy();
-                    Uri newuri = new Uri(proxy1);
-                    newProxy.Address = newuri;
-                    request.Proxy = newProxy;
-                }
-                if (j >= 18)
-                {
-                    WebProxy newProxy = new WebProxy();
-                    Uri newuri = new Uri(proxy2);
-                    newProxy.Address = newuri;
-                    request.Proxy = newProxy;
-                }
-                if (j >= 27)
-                {
-                    WebProxy newProxy = new WebProxy();
-                    Uri newuri = new Uri(proxy3);
-                    newProxy.Address = newuri;
-                    request.Proxy = newProxy;
-                }
-                if (j == 36)
-                { 
-                    request.Proxy = null;
-                    j = 0;
-                }
-                HttpWebResponse response = null;
-                await Task.Delay(1000);
-                try
-                {
-                    response = (HttpWebResponse)request.GetResponse();
-                }
-                catch (System.Net.WebException ex)
-                {
-                    response = null;
-                    md5Box.Text = md5Box.Text + ex.Message;
-                    startButton.Enabled = true;
-                    md5Box.ReadOnly = false;
-                    stringBox.ReadOnly = false;
-                    return;
-                }
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    Stream receiveStream = response.GetResponseStream();
-                    StreamReader readStream = null;
 
-                    if (response.CharacterSet == null)
-                    {
-                        readStream = new StreamReader(receiveStream);
-                    }
-                    else
-                    {
-                        readStream = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet));
-                    }
-
-                    string data = readStream.ReadToEnd();
-                    Regex rx = new Regex(@"""long-content hash"">(\S+)</em><");
-                    MatchCollection matches = rx.Matches(data);
-                    string Out = Convert.ToString(matches[0].Groups[1]);
-                    md5Box.Text = md5Box.Text + Out + Environment.NewLine;
-                    response.Close();
-                    readStream.Close();
-                    i++;
-                    j++;
-                    startButton.Enabled = true;
-                    md5Box.ReadOnly = false;
-                    stringBox.ReadOnly = false;
-                }
-            }
-            return;
-        }
         public async Task MD5ToString()
         {
-            startButton.Enabled = false;
+            decypherToolStripMenuItem.Enabled = false;
             md5Box.ReadOnly = true;
-            stringBox.ReadOnly = true;
             stringBox.Text = "";
+            var userlist = new List<string>();
+            var passlist = new List<string>();
             string[] newArray = md5Box.Text.Split(new string[] { System.Environment.NewLine }, StringSplitOptions.None);
-            int i = 0;
-            int j = 0;
             foreach (var str in newArray)
             {
-                string url = baseaddress + md5query + newArray[i];
+                string[] s = str.Split(':');
+                userlist.Add(s[0]);
+                passlist.Add(s[1]);
+            }
+            int i = 0;
+            int j = 0;
+            foreach (var str in passlist)
+            {
+                string url = baseaddress + md5query + passlist[i];
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
                 request.UserAgent = @"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.0.4) Gecko/20060508 Firefox/1.5.0.4";
                 if (j >= 9)
@@ -159,9 +82,8 @@ namespace MD5_Tool
                 {
                     response = null;
                     stringBox.Text = stringBox.Text + ex.Message;
-                    startButton.Enabled = true;
+                    decypherToolStripMenuItem.Enabled = true;
                     md5Box.ReadOnly = false;
-                    stringBox.ReadOnly = false;
                     return;
                 }
 
@@ -183,14 +105,13 @@ namespace MD5_Tool
                     Regex rx = new Regex(@"""long-content string"">(\S+)</em><");
                     MatchCollection matches = rx.Matches(data);
                     string Out = Convert.ToString(matches[0].Groups[1]);
-                    stringBox.Text = stringBox.Text + Out + Environment.NewLine;
+                    stringBox.Text = stringBox.Text + userlist[i] + ':' + Out + Environment.NewLine;
                     response.Close();
                     readStream.Close();
                     i++;
                     j++;
-                    startButton.Enabled = true;
+                    decypherToolStripMenuItem.Enabled = true;
                     md5Box.ReadOnly = false;
-                    stringBox.ReadOnly = false;
                 }
 
             }
@@ -349,37 +270,13 @@ namespace MD5_Tool
             InitializeComponent();
         }
         //Open Files
-        private void stringFileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Stream fileStream = null;
-            OpenFileDialog openDialog = new OpenFileDialog();
-            openDialog.InitialDirectory = "c:\\";
-            openDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
-            openDialog.FilterIndex = 1;
-            openDialog.RestoreDirectory = true;
-            var ret = openDialog.ShowDialog();
-            if (ret == DialogResult.OK)
-            {
-                try
-                {
-                    if ((fileStream = openDialog.OpenFile()) != null)
-                    {
-                        stringBox.Text = File.ReadAllText(openDialog.FileName);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error!: " + ex.Message);
-                }
-            }
-        }
-        private void mD5ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Stream fileStream = null;
             OpenFileDialog openDialog = new OpenFileDialog();
             openDialog.InitialDirectory = "c:\\";
             openDialog.Filter = "hsh files (*.hsh)|*.hsh|All files (*.*)|*.*";
-            openDialog.FilterIndex = 1;
+            openDialog.FilterIndex = 2;
             openDialog.RestoreDirectory = true;
             var ret = openDialog.ShowDialog();
             if (ret == DialogResult.OK)
@@ -402,39 +299,20 @@ namespace MD5_Tool
         {
             if (stringBox.Text.Length != 0)
             {
-                startButton.Enabled = true;
+                decypherToolStripMenuItem.Enabled = true;
                 saveToolStripMenuItem.Enabled = true;
-                stringOutputtxtToolStripMenuItem.Enabled = true;
             }
             else
             {
-                stringOutputtxtToolStripMenuItem.Enabled = false;
+                saveToolStripMenuItem.Enabled = false;
             }
             if (stringBox.Text.Length == 0 && md5Box.Text.Length == 0)
             {
                 saveToolStripMenuItem.Enabled = false;
-                startButton.Enabled = false;
+                decypherToolStripMenuItem.Enabled = false;
             }
         }
-        private void md5Box_TextChanged(object sender, EventArgs e)
-        {
-            if (md5Box.Text.Length != 0)
-            {
-                startButton.Enabled = true;
-                saveToolStripMenuItem.Enabled = true;
-                mD5OutputhshToolStripMenuItem.Enabled = true;
-            }
-            else
-            {
-                mD5OutputhshToolStripMenuItem.Enabled = false;
-            }
-            if (stringBox.Text.Length == 0 && md5Box.Text.Length == 0)
-            {
-                saveToolStripMenuItem.Enabled = false;
-                startButton.Enabled = false;
-            }
-        }
-        private void stringOutputtxtToolStripMenuItem_Click(object sender, EventArgs e)
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveDialog = new SaveFileDialog();
             saveDialog.InitialDirectory = "c:\\";
@@ -460,80 +338,15 @@ namespace MD5_Tool
                 }
             }
         }
-        private void mD5OutputhshToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SaveFileDialog saveDialog = new SaveFileDialog();
-            saveDialog.InitialDirectory = "c:\\";
-            saveDialog.Filter = "hsh files (*.hsh)|*.hsh|All files (*.*)|*.*";
-            saveDialog.FilterIndex = 1;
-            saveDialog.RestoreDirectory = true;
-            var ret = saveDialog.ShowDialog();
-            if (ret == DialogResult.OK)
-            {
-                try
-                {
-                    if (saveDialog.FileName != "")
-                    {
-                        using (StreamWriter sw = new StreamWriter(saveDialog.OpenFile()))
-                        {
-                            sw.Write(md5Box.Text);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error!: " + ex.Message);
-                }
-            }
-        }
         //Close Button
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
         }
-        //Operation Buttons
-        private void stringToMd5Button_Click(object sender, EventArgs e)
-        {
-            stringToMd5Button.BackColor = Color.Lime;
-            stringToMd5Button.ForeColor = Color.Black;
-            md5ToStringButton.BackColor = Color.Black;
-            md5ToStringButton.ForeColor = Color.Lime;
-            stm = true;
-        }
-        private void md5ToStringButton_Click(object sender, EventArgs e)
-        {
-            stringToMd5Button.BackColor = Color.Black;
-            stringToMd5Button.ForeColor = Color.Lime;
-            md5ToStringButton.BackColor = Color.Lime;
-            md5ToStringButton.ForeColor = Color.Black;
-            stm = false;
-        }
         //Start Buttons
-        private void startButton_Click(object sender, EventArgs e)
+        private void decypherToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (stm == false)
-            {
-                MD5ToString();
-            }
-            else
-            {
-                StringToMD5();
-            }
-        }
-        private void startButton_EnabledChanged(object sender, EventArgs e)
-        {
-            var btn = (Button)sender;
-            btn.ForeColor = btn.Enabled ? Color.Lime : Color.Gray;
-        }
-        private void startButton_Paint(object sender, PaintEventArgs e)
-        {
-            var btn = (Button)sender;
-            var drawBrush = new SolidBrush(btn.ForeColor);
-            var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-            startButton.Text = string.Empty;
-            e.Graphics.DrawString("Start", btn.Font, drawBrush, e.ClipRectangle, sf);
-            drawBrush.Dispose();
-            sf.Dispose();
+            MD5ToString();
         }
         //Proxy List
         private void proxyListToolStripMenuItem_Click(object sender, EventArgs e)
